@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Countdown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a1a1a;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border: 4px solid #636363;
+            border-radius: 8px;
+        }
+
+        .time-block {
+            background-color: #4CAF50;
+            padding: 20px;
+            text-align: center;
+            border: 4px solid;
+            border-color: #81C784 #388E3C #388E3C #81C784;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+        }
+
+        .number {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px #388E3C;
+        }
+
+        .label {
+            font-size: 0.8em;
+            color: #d3d3d3;
+        }
+
+        .title {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #4CAF50;
+            text-align: center;
+            text-shadow: 2px 2px #388E3C;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="title" id="title">Wir sind bald für dich da!</div>
+    <div class="countdown-container">
+        <div class="time-block">
+            <div class="number" id="days">00</div>
+            <div class="label">DAYS</div>
+        </div>
+        <div class="time-block">
+            <div class="number" id="hours">00</div>
+            <div class="label">HOURS</div>
+        </div>
+        <div class="time-block">
+            <div class="number" id="minutes">00</div>
+            <div class="label">MINUTES</div>
+        </div>
+        <div class="time-block">
+            <div class="number" id="seconds">00</div>
+            <div class="label">SECONDS</div>
+        </div>
+    </div>
+
+    <script>
+        const targetDate = new Date('2025-05-01T00:00:00').getTime();
+        const titleElement = document.getElementById('title');
+        const messages = [
+            "Wir sind bald für dich da!",  // German
+            "We will be there for you soon!",  // English
+            "すぐにあなたのためにそこにいます!"  // Japanese
+        ];
+        let messageIndex = 0;
+
+        function typeWriter(text, element, callback) {
+            let i = 0;
+            element.textContent = "";
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, 100); // Adjust typing speed here
+                } else if (callback) {
+                    setTimeout(callback, 1000); // Wait 1 second after typing finishes
+                }
+            }
+            type();
+        }
+
+        function changeMessage() {
+            typeWriter(messages[messageIndex], titleElement, () => {
+                messageIndex = (messageIndex + 1) % messages.length; // Cycle through the messages
+                setTimeout(() => {
+                    typeWriter("", titleElement, () => { // Clear the text
+                        setTimeout(changeMessage, 1000); // Wait a second before showing the next message
+                    });
+                }, 10000); // Wait for 10 seconds before clearing the message
+            });
+        }
+
+        // Initial update
+        updateCountdown();
+        // Update every second
+        setInterval(updateCountdown, 1000);
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const timeRemaining = targetDate - now;
+
+            if (timeRemaining <= 0) {
+                document.querySelector('.countdown-container').innerHTML = '<div class="time-block">TIME REACHED!</div>';
+                return;
+            }
+
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Start the typing animation
+        changeMessage();
+    </script>
+</body>
+</html>
